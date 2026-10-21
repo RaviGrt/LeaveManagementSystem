@@ -1,57 +1,62 @@
 package com.lms;
 
 import com.lms.model.*;
+import com.lms.enums.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Main driver class demonstrating inheritance with different employee types.
+ * Main driver class demonstrating polymorphism (both runtime and compile-time).
  *
  * @author Golla Raviteja
  */
 public class Main {
     public static void main(String[] args) {
-        System.out.println("========================================");
-        System.out.println("   Leave Management System v3.0");
-        System.out.println("   Student: GOLLA RAVITEJA");
-        System.out.println("========================================\n");
+        System.out.println("========================================================");
+        System.out.println("          Leave Management System v4.0");
+        System.out.println("          Student: GOLLA RAVITEJA");
+        System.out.println("   Demonstrating: Polymorphism (Runtime + Compile-time)");
+        System.out.println("========================================================\n");
 
-        // Create different employee types - Inheritance demonstration
-        FullTimeEmployee ft = new FullTimeEmployee("FT001", "Ravi Kumar", "Engineering");
-        PartTimeEmployee pt = new PartTimeEmployee("PT001", "Priya Sharma", "Marketing");
-        Intern intern = new Intern("IN001", "Arjun Reddy", "R&D", "Dr. Venkat");
+        // ---- POLYMORPHISM (RUNTIME / DYNAMIC DISPATCH) ----
+        // Using List<Employee> - same method call, different behavior per type
+        List<Employee> employees = new ArrayList<>();
+        employees.add(new FullTimeEmployee("FT001", "Ravi Kumar", "Engineering"));
+        employees.add(new PartTimeEmployee("PT001", "Priya Sharma", "Marketing"));
+        employees.add(new Intern("IN001", "Arjun Reddy", "R&D", "Dr. Venkat"));
 
-        System.out.println("=== Employee Details (Inheritance Demo) ===\n");
-        ft.displayDetails();
-        System.out.println();
-        pt.displayDetails();
-        System.out.println();
-        intern.displayDetails();
+        System.out.println("=== RUNTIME POLYMORPHISM: Processing List<Employee> ===\n");
+        System.out.println("--- Initial Details ---");
+        for (Employee emp : employees) {
+            emp.displayDetails();
+            System.out.println();
+        }
 
-        // Test type-specific leave rules
-        System.out.println("\n=== Type-Specific Leave Rules ===\n");
+        System.out.println("--- Applying 3 Days Leave (Polymorphic dispatch) ---");
+        for (Employee emp : employees) {
+            System.out.println("\n" + emp.getName() + " (" + emp.getEmployeeType() + "):");
+            emp.applyLeave(3);
+        }
 
-        System.out.println("Full-Time - Apply 10 days:");
-        ft.applyLeave(10);
+        // ---- POLYMORPHISM (COMPILE-TIME / METHOD OVERLOADING) ----
+        System.out.println("\n\n=== COMPILE-TIME POLYMORPHISM: Method Overloading ===\n");
 
-        System.out.println("\nPart-Time - Apply 3 days:");
-        pt.applyLeave(3);
+        Employee ravi = employees.get(0);
 
-        System.out.println("\nPart-Time - Apply 7 days (exceeds consecutive limit):");
-        pt.applyLeave(7);
+        System.out.println("Overload 1 - applyLeave(int days):");
+        ravi.applyLeave(2);
 
-        System.out.println("\nIntern - Apply 2 days:");
-        intern.applyLeave(2);
+        System.out.println("\nOverload 2 - applyLeave(int days, LeaveType, String reason):");
+        ravi.applyLeave(3, LeaveType.SICK, "Medical appointment");
 
-        System.out.println("\nIntern - Apply 20 days (exceeds balance):");
-        intern.applyLeave(20);
+        // ---- LEAVE CANCELLATION ----
+        System.out.println("\n\n=== Leave Cancellation ===\n");
+        ravi.cancelLeave(2);
 
-        // Leave cancellation
-        System.out.println("\n=== Leave Cancellation ===\n");
-        System.out.println("Full-Time - Cancel 5 days:");
-        ft.cancelLeave(5);
-
-        System.out.println("\n=== Final Balances ===\n");
-        System.out.println(ft);
-        System.out.println(pt);
-        System.out.println(intern);
+        // ---- FINAL STATUS ----
+        System.out.println("\n=== Final Balances (using toString - Polymorphism) ===\n");
+        for (Employee emp : employees) {
+            System.out.println("  " + emp);
+        }
     }
 }

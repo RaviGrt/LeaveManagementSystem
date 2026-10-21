@@ -1,47 +1,31 @@
 package com.lms.model;
 
+import com.lms.enums.LeaveType;
+
 /**
  * Abstract base class representing an Employee in the organization.
- * Demonstrates: Abstraction, Encapsulation, Access Modifiers.
- *
- * <p>This class defines the common structure and behavior for all employee types.
- * Subclasses must implement type-specific leave validation rules.</p>
+ * Demonstrates: Abstraction, Encapsulation, Access Modifiers, Method Overloading.
  *
  * @author Golla Raviteja
- * @version 3.0
+ * @version 4.0 - Added method overloading (compile-time polymorphism)
  */
 public abstract class Employee {
-    // Encapsulation: private fields with controlled access
     private String employeeId;
     private String name;
     private String department;
-
-    // Protected: accessible by subclasses for specialized leave logic
     protected int leaveBalance;
     protected int maxLeaveAllowance;
 
-    /**
-     * Constructs an Employee with validated parameters.
-     *
-     * @param employeeId    Unique identifier for the employee
-     * @param name          Full name of the employee
-     * @param department    Department the employee belongs to
-     * @param leaveBalance  Initial leave balance (days)
-     * @throws IllegalArgumentException if any parameter is invalid
-     */
     public Employee(String employeeId, String name, String department, int leaveBalance) {
-        if (employeeId == null || employeeId.trim().isEmpty()) {
+        if (employeeId == null || employeeId.trim().isEmpty())
             throw new IllegalArgumentException("Employee ID cannot be null or empty.");
-        }
-        if (name == null || name.trim().isEmpty()) {
+        if (name == null || name.trim().isEmpty())
             throw new IllegalArgumentException("Name cannot be null or empty.");
-        }
-        if (department == null || department.trim().isEmpty()) {
+        if (department == null || department.trim().isEmpty())
             throw new IllegalArgumentException("Department cannot be null or empty.");
-        }
-        if (leaveBalance < 0) {
+        if (leaveBalance < 0)
             throw new IllegalArgumentException("Leave balance cannot be negative.");
-        }
+
         this.employeeId = employeeId;
         this.name = name;
         this.department = department;
@@ -56,39 +40,43 @@ public abstract class Employee {
     public int getLeaveBalance() { return leaveBalance; }
     public int getMaxLeaveAllowance() { return maxLeaveAllowance; }
 
-    // ---- Setters with defensive validation ----
+    // ---- Setters ----
     public void setName(String name) {
-        if (name != null && !name.trim().isEmpty()) {
-            this.name = name;
-        }
+        if (name != null && !name.trim().isEmpty()) this.name = name;
     }
-
     public void setDepartment(String department) {
-        if (department != null && !department.trim().isEmpty()) {
-            this.department = department;
-        }
+        if (department != null && !department.trim().isEmpty()) this.department = department;
     }
-
     protected void setLeaveBalance(int balance) {
-        if (balance >= 0) {
-            this.leaveBalance = balance;
-        }
+        if (balance >= 0) this.leaveBalance = balance;
     }
 
     /**
-     * Abstract method: each employee type implements its own leave validation rules.
-     * Demonstrates: Abstraction & Polymorphism (runtime/dynamic dispatch).
+     * Apply for leave (basic version).
+     * RUNTIME POLYMORPHISM: Each subclass overrides with type-specific rules.
      *
-     * @param days Number of leave days requested
-     * @return true if leave was approved, false otherwise
+     * @param days Number of leave days
+     * @return true if approved
      */
     public abstract boolean applyLeave(int days);
 
     /**
-     * Cancel previously approved leave, restoring days to balance.
+     * METHOD OVERLOADING (Compile-time Polymorphism):
+     * Apply for leave with type and reason.
      *
-     * @param days Number of days to restore
-     * @return true if cancellation was successful
+     * @param days   Number of leave days
+     * @param type   Type of leave (CASUAL, SICK, PRIVILEGE, UNPAID)
+     * @param reason Reason for leave
+     * @return true if approved
+     */
+    public boolean applyLeave(int days, LeaveType type, String reason) {
+        System.out.println("  [REQUEST] " + getName() + " requesting " + days + " day(s) of "
+                + type.getDisplayName() + " - Reason: " + reason);
+        return applyLeave(days);
+    }
+
+    /**
+     * Cancel previously approved leave.
      */
     public boolean cancelLeave(int days) {
         if (days <= 0) {
@@ -100,12 +88,13 @@ public abstract class Employee {
             return false;
         }
         leaveBalance += days;
-        System.out.println("  [OK] Leave cancelled for " + name + ": +" + days + " day(s) restored. Balance: " + leaveBalance);
+        System.out.println("  [OK] Leave cancelled for " + name + ": +" + days
+                + " day(s) restored. Balance: " + leaveBalance);
         return true;
     }
 
     /**
-     * Display employee details. Can be overridden for type-specific info.
+     * Display employee details.
      */
     public void displayDetails() {
         System.out.println("+--------------------------------------+");
@@ -117,21 +106,15 @@ public abstract class Employee {
         System.out.println("+--------------------------------------+");
     }
 
-    /**
-     * Returns the employee type as a string. Overridden by subclasses.
-     */
     public abstract String getEmployeeType();
 
-    /**
-     * Check current leave balance.
-     * @return remaining leave days
-     */
     public int checkLeaveBalance() {
         return leaveBalance;
     }
 
     @Override
     public String toString() {
-        return getEmployeeType() + " [" + employeeId + "] " + name + " (" + department + ") - Leave: " + leaveBalance + "/" + maxLeaveAllowance;
+        return getEmployeeType() + " [" + employeeId + "] " + name
+                + " (" + department + ") - Leave: " + leaveBalance + "/" + maxLeaveAllowance;
     }
 }

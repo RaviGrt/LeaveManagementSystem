@@ -6,55 +6,57 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Main driver class demonstrating polymorphism (both runtime and compile-time).
+ * Main driver class - now including Manager (Change Request).
  *
  * @author Golla Raviteja
  */
 public class Main {
     public static void main(String[] args) {
         System.out.println("========================================================");
-        System.out.println("          Leave Management System v4.0");
+        System.out.println("          Leave Management System v5.0");
         System.out.println("          Student: GOLLA RAVITEJA");
-        System.out.println("   Demonstrating: Polymorphism (Runtime + Compile-time)");
+        System.out.println("   Change Request: Manager Employee Type Added");
         System.out.println("========================================================\n");
 
-        // ---- POLYMORPHISM (RUNTIME / DYNAMIC DISPATCH) ----
-        // Using List<Employee> - same method call, different behavior per type
-        List<Employee> employees = new ArrayList<>();
-        employees.add(new FullTimeEmployee("FT001", "Ravi Kumar", "Engineering"));
-        employees.add(new PartTimeEmployee("PT001", "Priya Sharma", "Marketing"));
-        employees.add(new Intern("IN001", "Arjun Reddy", "R&D", "Dr. Venkat"));
+        // Create all employee types including Manager
+        FullTimeEmployee ft = new FullTimeEmployee("FT001", "Ravi Kumar", "Engineering");
+        PartTimeEmployee pt = new PartTimeEmployee("PT001", "Priya Sharma", "Marketing");
+        Intern intern = new Intern("IN001", "Arjun Reddy", "R&D", "Dr. Venkat");
+        Manager manager = new Manager("MGR001", "Lakshmi Devi", "Engineering", 5);
 
-        System.out.println("=== RUNTIME POLYMORPHISM: Processing List<Employee> ===\n");
-        System.out.println("--- Initial Details ---");
+        // Polymorphic list includes Manager
+        List<Employee> employees = new ArrayList<>();
+        employees.add(ft);
+        employees.add(pt);
+        employees.add(intern);
+        employees.add(manager);
+
+        System.out.println("=== All Employee Details ===\n");
         for (Employee emp : employees) {
             emp.displayDetails();
             System.out.println();
         }
 
-        System.out.println("--- Applying 3 Days Leave (Polymorphic dispatch) ---");
+        // Polymorphic leave applications
+        System.out.println("=== Polymorphic Leave Applications ===\n");
         for (Employee emp : employees) {
-            System.out.println("\n" + emp.getName() + " (" + emp.getEmployeeType() + "):");
+            System.out.println(emp.getName() + " (" + emp.getEmployeeType() + ") applying for 3 days:");
             emp.applyLeave(3);
+            System.out.println();
         }
 
-        // ---- POLYMORPHISM (COMPILE-TIME / METHOD OVERLOADING) ----
-        System.out.println("\n\n=== COMPILE-TIME POLYMORPHISM: Method Overloading ===\n");
+        // Method overloading
+        System.out.println("=== Method Overloading Demo ===\n");
+        System.out.println("Manager applying with LeaveType:");
+        manager.applyLeave(2, LeaveType.PRIVILEGE, "Family vacation");
 
-        Employee ravi = employees.get(0);
+        // Manager-specific: approve team leave
+        System.out.println("\n=== Manager Approval (Unique Capability) ===");
+        manager.approveTeamLeave(ft, 5);
+        manager.approveTeamLeave(intern, 20); // Should fail
 
-        System.out.println("Overload 1 - applyLeave(int days):");
-        ravi.applyLeave(2);
-
-        System.out.println("\nOverload 2 - applyLeave(int days, LeaveType, String reason):");
-        ravi.applyLeave(3, LeaveType.SICK, "Medical appointment");
-
-        // ---- LEAVE CANCELLATION ----
-        System.out.println("\n\n=== Leave Cancellation ===\n");
-        ravi.cancelLeave(2);
-
-        // ---- FINAL STATUS ----
-        System.out.println("\n=== Final Balances (using toString - Polymorphism) ===\n");
+        // Final balances
+        System.out.println("\n=== Final Balances ===\n");
         for (Employee emp : employees) {
             System.out.println("  " + emp);
         }

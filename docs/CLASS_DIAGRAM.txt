@@ -1,0 +1,20 @@
+
+============================================================
+         INITIAL CLASS DIAGRAM - Leave Management System
+============================================================
+
++---------------------------+
+|        Employee           |
++---------------------------+
+| - employeeId: String      |
+| - name: String            |
+| - department: String      |
+| - leaveBalance: int       |
++---------------------------+
+| + applyLeave(days): bool  |
+| + cancelLeave(days): bool |
+| + displayDetails(): void  |
+| + checkLeaveBalance(): int|
++---------------------------+
+
+============================================================

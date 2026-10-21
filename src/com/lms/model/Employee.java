@@ -1,13 +1,23 @@
 package com.lms.model;
 
 import com.lms.enums.LeaveType;
+import com.lms.exception.InsufficientLeaveBalanceException;
+import com.lms.exception.InvalidLeaveOperationException;
 
 /**
  * Abstract base class representing an Employee in the organization.
- * Demonstrates: Abstraction, Encapsulation, Access Modifiers, Method Overloading.
+ *
+ * <p><b>OOP Concepts Demonstrated:</b></p>
+ * <ul>
+ *   <li><b>Abstraction:</b> Abstract class forcing concrete implementations</li>
+ *   <li><b>Encapsulation:</b> Private fields with validated getters/setters</li>
+ *   <li><b>Polymorphism (Runtime):</b> Abstract applyLeave() overridden by subclasses</li>
+ *   <li><b>Polymorphism (Compile-time):</b> Overloaded applyLeave() methods</li>
+ *   <li><b>Custom Exceptions:</b> Domain-specific checked exceptions</li>
+ * </ul>
  *
  * @author Golla Raviteja
- * @version 4.0 - Added method overloading (compile-time polymorphism)
+ * @version 5.0 - Refactored with custom exceptions (replaces boolean error handling)
  */
 public abstract class Employee {
     private String employeeId;
@@ -52,50 +62,47 @@ public abstract class Employee {
     }
 
     /**
-     * Apply for leave (basic version).
-     * RUNTIME POLYMORPHISM: Each subclass overrides with type-specific rules.
+     * Apply for leave - abstract method (RUNTIME POLYMORPHISM).
+     * Each subclass implements type-specific validation rules.
      *
      * @param days Number of leave days
-     * @return true if approved
+     * @throws InsufficientLeaveBalanceException if balance is insufficient
+     * @throws InvalidLeaveOperationException if the operation is invalid
      */
-    public abstract boolean applyLeave(int days);
+    public abstract void applyLeave(int days)
+            throws InsufficientLeaveBalanceException, InvalidLeaveOperationException;
 
     /**
-     * METHOD OVERLOADING (Compile-time Polymorphism):
+     * METHOD OVERLOADING (COMPILE-TIME POLYMORPHISM):
      * Apply for leave with type and reason.
-     *
-     * @param days   Number of leave days
-     * @param type   Type of leave (CASUAL, SICK, PRIVILEGE, UNPAID)
-     * @param reason Reason for leave
-     * @return true if approved
      */
-    public boolean applyLeave(int days, LeaveType type, String reason) {
+    public void applyLeave(int days, LeaveType type, String reason)
+            throws InsufficientLeaveBalanceException, InvalidLeaveOperationException {
         System.out.println("  [REQUEST] " + getName() + " requesting " + days + " day(s) of "
                 + type.getDisplayName() + " - Reason: " + reason);
-        return applyLeave(days);
+        applyLeave(days);
     }
 
     /**
      * Cancel previously approved leave.
+     *
+     * @param days Number of days to restore
+     * @throws InvalidLeaveOperationException if the cancellation is invalid
      */
-    public boolean cancelLeave(int days) {
+    public void cancelLeave(int days) throws InvalidLeaveOperationException {
         if (days <= 0) {
-            System.out.println("  [ERROR] Cancel days must be positive.");
-            return false;
+            throw new InvalidLeaveOperationException(
+                    "Cancel days must be positive. Got: " + days, "CANCEL");
         }
         if (leaveBalance + days > maxLeaveAllowance) {
-            System.out.println("  [ERROR] Cannot exceed maximum allowance of " + maxLeaveAllowance + " days.");
-            return false;
+            throw new InvalidLeaveOperationException(
+                    "Cannot exceed maximum allowance of " + maxLeaveAllowance + " days.", "CANCEL");
         }
         leaveBalance += days;
         System.out.println("  [OK] Leave cancelled for " + name + ": +" + days
                 + " day(s) restored. Balance: " + leaveBalance);
-        return true;
     }
 
-    /**
-     * Display employee details.
-     */
     public void displayDetails() {
         System.out.println("+--------------------------------------+");
         System.out.printf("| %-12s: %-22s |%n", "ID", employeeId);

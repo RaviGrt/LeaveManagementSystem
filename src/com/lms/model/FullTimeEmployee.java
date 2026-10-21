@@ -1,15 +1,11 @@
 package com.lms.model;
 
+import com.lms.exception.InsufficientLeaveBalanceException;
+import com.lms.exception.InvalidLeaveOperationException;
+
 /**
  * Full-Time Employee with standard leave entitlements.
- * Demonstrates: Inheritance, Method Overriding.
- *
- * <p>Leave Rules:
- * <ul>
- *   <li>Standard balance: 25 days/year (casual + sick + privilege)</li>
- *   <li>Can carry over unused leaves</li>
- *   <li>No consecutive day limit per request</li>
- * </ul></p>
+ * Refactored to use custom exceptions instead of boolean returns.
  *
  * @author Golla Raviteja
  */
@@ -31,25 +27,19 @@ public class FullTimeEmployee extends Employee {
     public boolean isCanCarryOver() { return canCarryOver; }
     public void setCanCarryOver(boolean canCarryOver) { this.canCarryOver = canCarryOver; }
 
-    /**
-     * Full-time employees can apply for any number of days up to their balance.
-     * Overrides abstract method from Employee (Runtime Polymorphism).
-     */
     @Override
-    public boolean applyLeave(int days) {
+    public void applyLeave(int days)
+            throws InsufficientLeaveBalanceException, InvalidLeaveOperationException {
         if (days <= 0) {
-            System.out.println("  [ERROR] Leave days must be positive.");
-            return false;
+            throw new InvalidLeaveOperationException(
+                    "Leave days must be positive. Got: " + days, "APPLY");
         }
         if (days > leaveBalance) {
-            System.out.println("  [DENIED] " + getName() + ": Insufficient balance! Available: "
-                    + leaveBalance + ", Requested: " + days);
-            return false;
+            throw new InsufficientLeaveBalanceException(getName(), days, leaveBalance);
         }
         leaveBalance -= days;
         System.out.println("  [APPROVED] " + getName() + " (Full-Time): " + days
                 + " day(s) approved. Remaining: " + leaveBalance);
-        return true;
     }
 
     @Override

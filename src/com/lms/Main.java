@@ -7,12 +7,6 @@ import com.lms.service.LeaveService;
 import java.util.List;
 
 /**
- * ╔══════════════════════════════════════════════════════════════╗
- * ║         LEAVE MANAGEMENT SYSTEM - FINAL VERSION             ║
- * ║         Student: GOLLA RAVITEJA                             ║
- * ║         Course: CAIT / NMIT LMS (SD_B26_Batch_4)           ║
- * ╚══════════════════════════════════════════════════════════════╝
- *
  * <p>This driver class demonstrates ALL OOP concepts:</p>
  * <ol>
  *   <li>Encapsulation (private fields, validated accessors)</li>
